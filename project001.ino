@@ -82,7 +82,7 @@ void loop()
         col_scan=digitalRead(col[j]);
         if(col_scan==LOW)
         {
-          keypress(i,j);
+          getPressedKey(i,j);
           delay(300);
         }
       }
@@ -130,79 +130,50 @@ void loop()
 }
 
 
-void keypress(int i, int j)
+void getPressedKey(int i, int j)
 {
-  if(i==0&&j==0)
-  {
-    Serial.print("1");
-    inputcode = inputcode * 10 + 1;
+  if(j == 3){
+    if(i == 0){
+      Serial.print("A"); 
+      inputcode = 0; 
+    }
+    else if(i == 1){
+      Serial.print("B");
+      inputcode = 0;
+    }
+    else if(i == 2){
+      Serial.print("C");
+      inputcode = 0;
+    }
+    else{
+      Serial.print("D");
+      inputcode = 0;  
+    }
   }
-  if(i==0&&j==1)
-  {
-    Serial.print("2");
-    inputcode = inputcode * 10 + 2;
+  else if(i == 3){
+    if(j == 0){
+      Serial.print("*"); 
+      inputcode = 0; 
+    }
+    else if(j == 1){
+      Serial.print(0);
+      inputcode = inputcode * 10;
+    }
+    else if(j == 2){
+      Serial.print("#");
+      inputcode = 0;
+    }
+    else{
+      Serial.print("D");
+      inputcode = 0;  
+    }
   }
-  if(i==0&&j==2)
-  {
-    Serial.print("3");
-    inputcode = inputcode * 10 + 3;
+  else{
+    inputcode = inputcode * 10 + i*3 + j + 1;
+    Serial.print(i*3 + j + 1);
   }
-  if(i==0&&j==3)
-  {
-    Serial.println("A");
-  }
-  if(i==1&&j==0)
-  {
-    Serial.print("4");
-    inputcode = inputcode * 10 + 4;
-  }
-  if(i==1&&j==1)
-  {
-    Serial.print("5");
-    inputcode = inputcode * 10 + 5;
-  }
-  if(i==1&&j==2)
-  {
-    Serial.print("6");
-    inputcode = inputcode * 10 + 6;
-  }
-  if(i==1&&j==3)
-  {
-    Serial.println("B");
-  }
-  if(i==2&&j==0)
-  {
-    Serial.print("7");
-    inputcode = inputcode * 10 + 7;
-  }
-  if(i==2&&j==1)
-  {
-    Serial.print("8");
-    inputcode = inputcode * 10 + 8;
-  }
-  if(i==2&&j==2)
-  {
-    Serial.print("9");
-    inputcode = inputcode * 10 + 9;
-  }
-  if(i==2&&j==3)
-  {
-    Serial.println("C");
-  }
-  if(i==3&&j==0)
-  {
-    Serial.println("*");
-  }
-  if(i==3&&j==1)
-  {
-    Serial.print("0");
-    inputcode = inputcode * 10;
-  }
-  if(i==3&&j==2)
-    Serial.println("#");
-  if(i==3&&j==3)
-    Serial.println("D");
 }
+
 
 
 int getFingerprintID() {
