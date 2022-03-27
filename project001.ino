@@ -99,11 +99,21 @@ void loop()
     else if (operation == 202)
     {
 
-        // if (auth())
-        // {
-        //     Serial.print("Input New Passowrd :-> ")
-        //         enterPassword();
-        // }
+        if (auth())
+        {
+            Serial.print("Input New Passowrd :-> ");
+            int temp = enterPassword();
+            if(temp != -1)
+            {
+                passcode = temp;
+                Serial.print("\n Password Updated to -> ");
+                Serial.println(passcode);
+            }
+            else
+            {
+                Serial.print("\n Error !\n");
+            }
+        }
     }
     else if (operation == 203)
     {
