@@ -1,5 +1,6 @@
 
 #include <Adafruit_Fingerprint.h>
+#include<EEPROM.h>
 
 #if (defined(__AVR__) || defined(ESP8266)) && !defined(__AVR_ATmega2560__)
 // For UNO and others without hardware serial, we must use software serial...
@@ -22,12 +23,13 @@ int row[] = {4, 5, 6, 7};
 int col[] = {8, 9, 10, 11};
 int i, j;
 int col_scan;
-int passcode = 1234;
+int passcode;
 int inputcode = 0;
 int operation = -1;
 int id = 1;
 void setup()
 {
+    passcode = getPassword();
     pinMode(send_signal, OUTPUT);
     pinMode(open_lock, OUTPUT);
     Serial.begin(9600);
@@ -91,10 +93,13 @@ void loop()
 
     operation = enterOperation();
 
+    // A -> Unlock Door
     if (operation == 200)
     {
         auth();
     }
+    
+    // B -> Enroll New User
     else if (operation == 201)
     {
         if(auth()){
@@ -103,6 +108,8 @@ void loop()
         }
 
     }
+    
+    // C -> Password reset
     else if (operation == 202)
     {
 
@@ -113,6 +120,7 @@ void loop()
             if(temp != -1)
             {
                 passcode = temp;
+                savePassword(passcode);
                 Serial.print("\n Password Updated to -> ");
                 Serial.println(passcode);
             }
@@ -122,8 +130,14 @@ void loop()
             }
         }
     }
+    
+    // D -> Delete User
     else if (operation == 203)
     {
+        int id_del = auth();
+        if(id_del){
+            deleteFingerprint(id_del);
+        }
     }
     else if (operation == 204)
     {
@@ -158,6 +172,15 @@ int enterOperation()
             return key;
         }
     }
+}
+
+void savePassword(int passcode){
+  EEPROM.write(0, passcode/100);
+  EEPROM.write(1, passcode%100);
+}
+
+int getPassword(){
+  return EEPROM.read(0)*100 + EEPROM.read(1);
 }
 
 int enterPassword()
@@ -195,7 +218,7 @@ int enterPassword()
     return tempPassword;
 }
 
-bool auth()
+int auth()
 {
     // unlock check
     inputcode = enterPassword();
@@ -207,13 +230,13 @@ bool auth()
             Serial.println("\nAccepted");
             digitalWrite(open_lock, HIGH);
             delay(5000);
-            return true;
+            return b;
         }
     }
     Serial.println("\nDeclined");
     digitalWrite(send_signal, HIGH);
     delay(5000);
-    return false;
+    return 0;
 }
 
 int getPressedKey(int i, int j)
@@ -506,4 +529,24 @@ uint8_t getFingerprintEnroll() {
   }
 
   return true;
+}
+
+uint8_t deleteFingerprint(uint8_t id_del) {
+  uint8_t p = -1;
+
+  p = finger.deleteModel(id_del);
+
+  if (p == FINGERPRINT_OK) {
+    Serial.println("Deleted!");
+  } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
+    Serial.println("Communication error");
+  } else if (p == FINGERPRINT_BADLOCATION) {
+    Serial.println("Could not delete in that location");
+  } else if (p == FINGERPRINT_FLASHERR) {
+    Serial.println("Error writing to flash");
+  } else {
+    Serial.print("Unknown error: 0x"); Serial.println(p, HEX);
+  }
+
+  return p;
 }
