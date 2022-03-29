@@ -18,8 +18,8 @@
 int led = 13;
 int red = 14;
 int internal_led = 33;
-const char *ssid = "Redmi";
-const char *password = "9801754111abc@";
+const char *ssid = "PHMT";
+const char *password = "tlmt9452";
 
 #define emailSenderAccount "archits725@gmail.com"
 #define emailSenderPassword "qwerty123@"
@@ -67,6 +67,7 @@ void setup()
     Serial.println("");
     Serial.println("WiFi connected");
     digitalWrite(internal_led, LOW);
+    digitalWrite(red, LOW);
     Serial.print("Camera Ready! Use 'http://");
     Serial.print(WiFi.localIP());
     Serial.println("' to connect");
@@ -135,11 +136,23 @@ void setup()
 
 void loop()
 {
+    //delay(4000);
     // put your main code here, to run repeatedly:
     if (digitalRead(red) == HIGH)
     {
+        Serial.println("\nRecieved Signal\n");
         captureAndSendImage();
+        Serial.println("INPUT");
+        digitalWrite(led, HIGH); //Turn on
+        delay (1000); //Wait 1 sec
+        digitalWrite(led, LOW); //Turn off
+        delay (1000); //Wait 1 sec
+        Serial.println("blynk");
     }
+    //else{
+//      Serial.println("No signal");
+//    }
+    
 }
 
 void sendCallback(SendStatus msg)
@@ -227,9 +240,11 @@ void captureAndSendImage()
     // Start sending Email, can be set callback function to track the status
     if (!MailClient.sendMail(smtpData))
         Serial.println("Error sending Email, " + MailClient.smtpErrorReason());
+    else
+        Serial.println("----------------Mail Sent-----------");
 
     // Clear all data from Email object to free memory
     smtpData.empty();
-    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-    esp_deep_sleep_start();
+    //esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+    //esp_deep_sleep_start();
 }
