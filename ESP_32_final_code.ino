@@ -131,6 +131,8 @@ void setup()
     {
         Serial.printf("Camera init failed with error 0x%x", err);
         return;
+    }else {
+        Serial.println("Setup completed!");
     }
 }
 
@@ -141,18 +143,27 @@ void loop()
     if (digitalRead(red) == HIGH)
     {
         Serial.println("\nRecieved Signal\n");
-        captureAndSendImage();
-        Serial.println("INPUT");
-        digitalWrite(led, HIGH); //Turn on
-        delay (1000); //Wait 1 sec
-        digitalWrite(led, LOW); //Turn off
-        delay (1000); //Wait 1 sec
-        Serial.println("blynk");
+        //aptureAndSendImage();
+        captureImage();
+        buzz();
+        sendEmail();
     }
     //else{
 //      Serial.println("No signal");
 //    }
     
+}
+
+void buzz(){
+    
+        for(int i=0;i<20;i++){
+           // Serial.println("INPUT");
+        digitalWrite(led, HIGH); //Turn on
+        delay (750); //Wait 1 sec
+        digitalWrite(led, LOW); //Turn off
+        delay (750); //Wait 1 sec
+        //Serial.println("blynk");
+        }
 }
 
 void sendCallback(SendStatus msg)
@@ -167,7 +178,7 @@ void sendCallback(SendStatus msg)
     }
 }
 
-void captureAndSendImage()
+void captureImage()
 {
     camera_fb_t *fb = NULL;
     digitalWrite(4, HIGH);
@@ -203,7 +214,11 @@ void captureAndSendImage()
     rtc_gpio_hold_en(GPIO_NUM_4);
     //*************************************************************************************************************************
 
-    Serial.println("Preparing to send email");
+   
+}
+
+void sendEmail() {
+     Serial.println("Preparing to send email");
     Serial.println();
 
     // Set the SMTP Server Email host, port, account and password
